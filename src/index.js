@@ -15,7 +15,8 @@ const KEY = "28152174-c362e84e874961aded494c5b6";
 let pageNum = 1;
 let imagePerPage = 40;
 
-const lightbox = new SimpleLightbox('.gallery a', {captionDelay: 250, captionsData: "alt" });
+const lightbox = new SimpleLightbox('.gallery a', { captionDelay: 250, captionsData: "alt" });
+
 
 btnLoad.classList.add("is-hidden")
 
@@ -62,11 +63,10 @@ function parsingImages(images) {
     else if (images.data.totalHits < (pageNum + 1) * imagePerPage) { 
         throw new Error("We're sorry, but you've reached the end of search results.");
     }
-    else {
-        createMarkup(imagesArray);
-        let imageNumber = imagePerPage*pageNum;
-        Notify.success(`Hooray! We found ${imageNumber} images.`);
-    }
+    
+    createMarkup(imagesArray);
+    let imageNumber = imagePerPage*pageNum;
+    Notify.success(`Hooray! We found ${imageNumber} images.`);
 }
 
 
@@ -95,9 +95,19 @@ function createMarkup(images) {
         .join("");
     
     gallery.insertAdjacentHTML("beforeend", markup);
-    lightbox.refresh();
+    adjustView()
 }
 
+function adjustView() { 
+    lightbox.refresh();
+
+    const { height: cardHeight } = document.querySelector(".gallery").getBoundingClientRect();
+
+    window.scrollBy({
+    top: cardHeight,
+    behavior: "smooth",
+    });
+}
 
 const fetchPixbay = async (data) => {
 
