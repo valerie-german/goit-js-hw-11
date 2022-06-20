@@ -34,6 +34,7 @@ function showGallery(event) {
 
     gallery.innerHTML = "";
     btnLoad.classList.add("is-hidden")
+    pageNum = 1;
        
     searchImagesByInput(input.value);
 }
@@ -60,10 +61,10 @@ function parsingImages(images) {
     if (imagesArray.length < 1) {
         throw new Error("Sorry, there are no images matching your search query. Please try again.");
     }
-    else if (images.data.totalHits < (pageNum + 1) * imagePerPage) { 
+    else if (images.data.totalHits < pageNum * imagePerPage) { 
         throw new Error("We're sorry, but you've reached the end of search results.");
     }
-    
+
     createMarkup(imagesArray);
     let imageNumber = imagePerPage*pageNum;
     Notify.success(`Hooray! We found ${imageNumber} images.`);
