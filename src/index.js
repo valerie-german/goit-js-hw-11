@@ -1,7 +1,9 @@
 import './css/common.css';
 import './css/styles.css';
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from "simplelightbox";
 
 const axios = require('axios').default;
 
@@ -12,6 +14,8 @@ const gallery = document.querySelector(".gallery");
 const KEY = "28152174-c362e84e874961aded494c5b6";
 let pageNum = 1;
 let imagePerPage = 40;
+
+const lightbox = new SimpleLightbox('.gallery a', {captionDelay: 250, captionsData: "alt" });
 
 btnLoad.classList.add("is-hidden")
 
@@ -51,16 +55,17 @@ const searchImagesByInput = async (inputData) => {
 
 
 function parsingImages(images) { 
-    const imagesArray = images.hits;
+    const imagesArray = images.data.hits;
     if (imagesArray.length < 1) {
         throw new Error("Sorry, there are no images matching your search query. Please try again.");
     }
-    else if (images.totalHits < (pageNum + 1) * imagePerPage) { 
+    else if (images.data.totalHits < (pageNum + 1) * imagePerPage) { 
         throw new Error("We're sorry, but you've reached the end of search results.");
     }
-    else { 
+    else {
         createMarkup(imagesArray);
-        pageNum += 1;                
+        let imageNumber = imagePerPage*pageNum;
+        Notify.success(`Hooray! We found ${imageNumber} images.`);
     }
 }
 
@@ -90,6 +95,7 @@ function createMarkup(images) {
         .join("");
     
     gallery.insertAdjacentHTML("beforeend", markup);
+    lightbox.refresh();
 }
 
 
@@ -107,16 +113,5 @@ const fetchPixbay = async (data) => {
         
     });
     
-    const response = await fetch(`https://pixabay.com/api/?${params}`);
-    const images = await getJsonResponse(response);
-    return images;
-    
+    return await axios.get(`https://pixabay.com/api/?${params}`);
 };
-
-
-function getJsonResponse(response) { 
-    if (!response.ok) {
-        throw new Error(response.status);
-    }
-    return response.json();
-}
