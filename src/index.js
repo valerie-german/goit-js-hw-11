@@ -6,37 +6,64 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 const axios = require('axios').default;
 
 const form = document.querySelector("#search-form");
-// const input = form.querySelector("input");
-// const btn = form.querySelector("button");
+const input = form.querySelector("input");
+const btnLoad = document.querySelector(".load-more");
 const gallery = document.querySelector(".gallery");
 const KEY = "28152174-c362e84e874961aded494c5b6";
+let pageNum = 1;
+let imagePerPage = 40;
 
+btnLoad.classList.add("is-hidden")
 
-form.addEventListener("submit", getData)
+form.addEventListener("submit", showGallery)
+btnLoad.addEventListener("click", loadMoreImages)
 
-function getData(event) { 
+function loadMoreImages() { 
+    pageNum += 1;
+    searchImagesByInput(input.value);
+} 
+
+function showGallery(event) { 
     event.preventDefault();
     const [input] = event.currentTarget.elements;
-    const inputData = input.value;
 
     gallery.innerHTML = "";
-
-    fetchPixbay(inputData)
-        .then(images => { 
-            const imagesArray = images.hits;
-            if (imagesArray.length < 1) {
-                Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-            }
-            else { 
-                createMarkup(imagesArray);
-            }
-            
-        })
-        .catch(error => {
-            Notify.failure("Oops... something is wrong. Try again");
-        })   
+    btnLoad.classList.add("is-hidden")
        
+    searchImagesByInput(input.value);
 }
+
+
+const searchImagesByInput = async (inputData) => {
+    try {
+        const imagesJson = await fetchPixbay(inputData);
+        await parsingImages(imagesJson);
+        btnLoad.classList.remove("is-hidden");
+    } catch (error) {  
+        let message = error.message;
+        if (message === "") { 
+            message = "Oops... something is wrong. Try again"
+        }
+        Notify.failure(message);
+        btnLoad.classList.add("is-hidden")
+    }
+};
+
+
+function parsingImages(images) { 
+    const imagesArray = images.hits;
+    if (imagesArray.length < 1) {
+        throw new Error("Sorry, there are no images matching your search query. Please try again.");
+    }
+    else if (images.totalHits < (pageNum + 1) * imagePerPage) { 
+        throw new Error("We're sorry, but you've reached the end of search results.");
+    }
+    else { 
+        createMarkup(imagesArray);
+        pageNum += 1;                
+    }
+}
+
 
 function createMarkup(images) {    
     const markup = images
@@ -61,11 +88,13 @@ function createMarkup(images) {
             </div>`;
         })
         .join("");
-    gallery.innerHTML = markup;
+    
+    gallery.insertAdjacentHTML("beforeend", markup);
 }
 
 
-function fetchPixbay(data) {
+const fetchPixbay = async (data) => {
+
     const params = new URLSearchParams({
 
         key: KEY,
@@ -73,20 +102,21 @@ function fetchPixbay(data) {
         image_type: "photo",
         orientation: "horizontal",
         safesearch: true,
-        // _limit: 5,
+        page: pageNum,
+        per_page: imagePerPage,
         
-        // _page: 3
     });
+    
+    const response = await fetch(`https://pixabay.com/api/?${params}`);
+    const images = await getJsonResponse(response);
+    return images;
+    
+};
 
-    return fetch(`https://pixabay.com/api/?${params}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.status);
-            }
-            return response.json();
-        })
-        .catch(error => {
-            Notify.failure("Oops... something is wrong. Try again");
-        })
+
+function getJsonResponse(response) { 
+    if (!response.ok) {
+        throw new Error(response.status);
+    }
+    return response.json();
 }
-
