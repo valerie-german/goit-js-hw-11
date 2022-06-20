@@ -3,6 +3,56 @@
     --animation-duration: 250ms;
 }
 
+form{
+    position:fixed;
+    top: 0;
+    z-index: 2;
+    width: 100vw;
+    margin: 0 auto;
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(to bottom,#008876, #01746a);
+    margin-bottom: 20px;
+}
+
+button{
+    font: inherit;
+        width: 100px;
+        height: 38px;
+        border-radius: 5px;
+        text-transform: uppercase;
+        border: 1px solid rgb(3, 173, 136);
+        cursor: pointer;        
+}
+button:hover, button:focus{
+    background-color: rgb(223, 245, 241);
+}
+
+button.load-more{
+    display: block;
+   width: 120px;    
+    text-align: center;
+    padding: 0;
+    margin: 30px auto;
+    background-color: rgb(8, 121, 106);
+    color: rgba(255, 255, 255, 0.904);
+}
+button.load-more:hover, button.load-more:focus{
+    background-color: rgb(1, 148, 136);
+        color: #fff;
+    }
+
+input {
+    font: inherit;
+    width: 340px;
+    height: 38px;
+    border: 1px solid rgb(2, 139, 110);
+    border-radius: 5px;
+    padding: 10px;
+    margin-right: 7px;
+
+}
+
 .gallery {
     display: grid;
     max-width: 1240px;
@@ -14,10 +64,11 @@
     list-style: none;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 126px;
+    
 }
 
 .gallery > div{
-    position: relative;
     border-radius: 12px;
     box-shadow: 0px 4px 8px 1px rgba(49, 64, 75, 0.15);
     background-color: #fff;
@@ -37,15 +88,7 @@
     transition: transform var(--animation-duration) var(--timing-function);
 }
 
-/* .gallery__link {
-    display: block;
-    text-decoration: none;
-    height: 100%;
-}
 
-.gallery__link:hover {
-    cursor: zoom-in;
-} */
 .info{    
     padding: 20px;
     display: flex;
