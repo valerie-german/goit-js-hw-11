@@ -1,4 +1,6 @@
 import './css/common.css';
+import './css/styles.css';
+
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const axios = require('axios').default;
@@ -17,6 +19,8 @@ function getData(event) {
     const [input] = event.currentTarget.elements;
     const inputData = input.value;
 
+    gallery.innerHTML = "";
+
     fetchPixbay(inputData)
         .then(images => { 
             const imagesArray = images.hits;
@@ -29,34 +33,35 @@ function getData(event) {
             
         })
         .catch(error => {
-            Notify.failure("Error.22");
+            Notify.failure("Oops... something is wrong. Try again");
         })   
        
 }
 
-function createMarkup(images) {
-  const markup = images
-    .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => {
-      return `<div class="photo-card">
-        <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-        <div class="info">
-            <p class="info-item">
-            <b>Likes ${likes}</b>
-            </p>
-            <p class="info-item">
-            <b>Views ${views}</b>
-            </p>
-            <p class="info-item">
-            <b>Comments ${comments}</b>
-            </p>
-            <p class="info-item">
-            <b>Downloads ${downloads}</b>
-            </p>
-        </div>
-        </div>`;
-    })
-    .join("");
-  gallery.innerHTML = markup;
+function createMarkup(images) {    
+    const markup = images
+        .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => {
+            return `<div class="photo-card"><a class="gallery__item" href="${largeImageURL}">
+            <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+            <div class="info">
+                <p class="info-item">
+                <b><span>Likes:</span> ${likes}</b>
+                </p>
+                <p class="info-item">
+                <b><span>Views:</span> ${views}</b>
+                </p>
+                <p class="info-item">
+                <b><span>Comments:</span> ${comments}</b>
+                </p>
+                <p class="info-item">
+                <b><span>Downloads:</span> ${downloads}</b>
+                </p>
+            </div>
+            </a>
+            </div>`;
+        })
+        .join("");
+    gallery.innerHTML = markup;
 }
 
 
