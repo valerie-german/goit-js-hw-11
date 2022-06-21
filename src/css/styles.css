@@ -24,7 +24,7 @@ button{
         border: 1px solid rgb(3, 173, 136);
         cursor: pointer;        
 }
-button:hover, button:focus{
+form button:hover, form button:focus{
     background-color: rgb(223, 245, 241);
 }
 
@@ -37,9 +37,9 @@ button.load-more{
     background-color: rgb(8, 121, 106);
     color: rgba(255, 255, 255, 0.904);
 }
-button.load-more:hover, button.load-more:focus{
+.load-more:hover, .load-more:focus{
     background-color: rgb(1, 148, 136);
-        color: #fff;
+    color: #fff;
     }
 
 input {
