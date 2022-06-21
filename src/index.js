@@ -2,21 +2,21 @@ import './css/common.css';
 import './css/styles.css';
 import "simplelightbox/dist/simple-lightbox.min.css";
 
+import ImageServiceApi from './images-service.js';
+
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from "simplelightbox";
 
-const axios = require('axios').default;
+
 
 const form = document.querySelector("#search-form");
-const input = form.querySelector("input");
 const btnLoad = document.querySelector(".load-more");
 const gallery = document.querySelector(".gallery");
-const KEY = "28152174-c362e84e874961aded494c5b6";
 let pageNum = 1;
 let imagePerPage = 40;
 
 const lightbox = new SimpleLightbox('.gallery a', { captionDelay: 250, captionsData: "alt" });
-
+const newImageService = new ImageServiceApi();
 
 btnLoad.classList.add("is-hidden")
 
@@ -25,24 +25,26 @@ btnLoad.addEventListener("click", loadMoreImages)
 
 function loadMoreImages() { 
     pageNum += 1;
-    searchImagesByInput(input.value);
+    searchImagesByInput(pageNum, imagePerPage);
 } 
 
 function showGallery(event) { 
     event.preventDefault();
-    const [input] = event.currentTarget.elements;
+
+    newImageService.query = event.currentTarget.elements.searchQuery.value;
+   
 
     gallery.innerHTML = "";
     btnLoad.classList.add("is-hidden")
     pageNum = 1;
        
-    searchImagesByInput(input.value);
+    searchImagesByInput(pageNum, imagePerPage);
 }
 
 
-const searchImagesByInput = async (inputData) => {
+const searchImagesByInput = async (page, perPage) => {
     try {
-        const imagesJson = await fetchPixbay(inputData);
+        const imagesJson = await newImageService.fetchPixbay(page, perPage);
         await parsingImages(imagesJson);
         btnLoad.classList.remove("is-hidden");
     } catch (error) {  
@@ -110,19 +112,3 @@ function adjustView() {
     });
 }
 
-const fetchPixbay = async (data) => {
-
-    const params = new URLSearchParams({
-
-        key: KEY,
-        q: `${data}`,
-        image_type: "photo",
-        orientation: "horizontal",
-        safesearch: true,
-        page: pageNum,
-        per_page: imagePerPage,
-        
-    });
-    
-    return await axios.get(`https://pixabay.com/api/?${params}`);
-};
